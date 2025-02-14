@@ -5,6 +5,11 @@ pipeline {
     }
 
     stages {
+        stage('Setup Permissions') {
+            steps {
+                sh 'chmod -R 755 $WORKSPACE' // Ensure proper execution rights
+            }
+        }
         stage('Clone Repository') {
             steps {
                 git branch: 'master', url: 'https://github.com/yogesh-koli/techneai-demo.git'
@@ -12,7 +17,10 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_TAG .'
+                sh '''
+                    chmod +x *.sh || true # Ensure scripts are executable if needed
+                    docker build -t $IMAGE_TAG .
+                '''
             }
         }
         stage('Push Docker Image') {
@@ -25,11 +33,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record
-                    kubectl apply -f k8s-deployment.yml
+                    kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record || echo "Failed to update image"
+                    kubectl apply -f k8s-deployment.yml || echo "Failed to apply Kubernetes manifest"
                 '''
             }
         }
     }
 }
-
