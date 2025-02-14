@@ -4,14 +4,12 @@ pipeline {
         IMAGE_TAG = "yogik001/nginx-demo:latest"
     }
 
-      stages {
+    stages {
         stage('Test Shell') {
             steps {
                 sh 'echo "Jenkins Shell Execution Test"'
             }
         }
-    }
-    
         stage('Clone Repository') {
             steps {
                 git branch: 'master', url: 'https://github.com/yogesh-koli/techneai-demo.git'
@@ -19,7 +17,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE_TAG ."
+                sh 'docker build -t $IMAGE_TAG .'
             }
         }
         stage('Push Docker Image') {
@@ -32,8 +30,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record
-                kubectl apply -f k8s-deployment.yaml
+                    kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record
+                    kubectl apply -f k8s-deployment.yaml
                 '''
             }
         }
