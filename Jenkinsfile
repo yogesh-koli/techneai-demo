@@ -3,7 +3,15 @@ pipeline {
     environment {
         IMAGE_TAG = "yogik001/nginx-demo:latest"
     }
-    stages {
+
+      stages {
+        stage('Test Shell') {
+            steps {
+                sh 'echo "Jenkins Shell Execution Test"'
+            }
+        }
+    }
+    
         stage('Clone Repository') {
             steps {
                 git branch: 'master', url: 'https://github.com/yogesh-koli/techneai-demo.git'
