@@ -26,7 +26,7 @@ pipeline {
             steps {
                 sh '''
                     kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record
-                    kubectl apply -f k8s-deployment.yaml
+                    kubectl apply -f k8s-deployment.yml
                 '''
             }
         }
