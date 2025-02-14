@@ -5,11 +5,6 @@ pipeline {
     }
 
     stages {
-        stage('Test Shell') {
-            steps {
-                sh 'echo "Jenkins Shell Execution Test"'
-            }
-        }
         stage('Clone Repository') {
             steps {
                 git branch: 'master', url: 'https://github.com/yogesh-koli/techneai-demo.git'
