@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/yogesh-koli/techneai-demo.git'
+                git branch: 'master', url: 'https://github.com/yogesh-koli/techneai-demo.git'
             }
         }
         stage('Build Docker Image') {
