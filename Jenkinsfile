@@ -1,18 +1,13 @@
 pipeline {
     agent any
     environment {
-        IMAGE_TAG = "yogik001/nginx-demo:latest"
+        IMAGE_TAG = "yogik001/nginx-demo:${BUILD_NUMBER}"  // Use unique build number for versioning
     }
 
     stages {
-        stage('Setup Permissions') {
-            steps {
-                sh 'chmod -R 755 $WORKSPACE' // Ensure proper execution rights
-            }
-        }
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url: 'https://github.com/yogesh-koli/techneai-demo.git'
+                git branch: 'main', url: 'https://github.com/yogesh-koli/techneai-demo.git'
             }
         }
         stage('Build Docker Image') {
@@ -25,7 +20,8 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: '001', url: 'https://index.docker.io/v1/']) {
+                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: 'https://index.docker.io/v1/']) {
+                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                     sh 'docker push $IMAGE_TAG'
                 }
             }
@@ -33,10 +29,15 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record || echo "Failed to update image"
-                    kubectl apply -f k8s-deployment.yml || echo "Failed to apply Kubernetes manifest"
+                    if kubectl get deployment nginx-demo; then
+                        kubectl set image deployment/nginx-demo nginx=$IMAGE_TAG --record
+                        kubectl rollout restart deployment/nginx-demo
+                    else
+                        kubectl apply -f k8s-deployment.yml
+                    fi
                 '''
             }
         }
     }
 }
+
