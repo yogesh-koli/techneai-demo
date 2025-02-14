@@ -3,6 +3,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'yogik001/nginx-demo'
         IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
     }
     stages {
         stage('Clone Repository') {
@@ -18,7 +19,7 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: 'https://hub.docker.com/']) {
+                withDockerRegistry([credentialsId: '001', url: 'https://hub.docker.com/']) {
                     sh 'docker push $IMAGE_TAG'
                 }
             }
